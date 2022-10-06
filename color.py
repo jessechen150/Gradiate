@@ -1,31 +1,83 @@
+from PIL import Image
+
+
+
 class Colormap:
     """
-    Static class for holding various
-    methods relating to color maps.
+    Colormap between two or more colors.
     """
-
-    @staticmethod
-    def linearMap(color1, color2, colorSpace, resolution=100):
+    
+    def __init__(self, color1, color2, domain, family='linear', mode='RGB', resolution=99):
         """
-        Returns a `resolution`-length list of
-        a linear interpolation between `color1` and
-        `color2` in color space `colorSpace`.
+        Creates a color map between `color1` and `color2`,
+        which maps to `domain` (list or tuple of length 2,
+        where the domain[0] <= domain[1]).
 
-        Currently supported color spaces:
-            * RGB in format (r, g, b)
+        `family` specifies the type of color map.
+        `mode` specifies the color space.
+        `resolution` + 1 is the number of colors in the map.
         """
 
-        if colorSpace == 'RGB':
-            return Colormap.linearMapRGB(color1, color2, resolution)
-        else:
-            raise NotImplemented
+        self.color1 = color1
+        self.color2 = color2
+        self.domain = domain
+        self.family = family
+        self.mode = mode
+        self.resolution = resolution
 
+        if family not in ('linear'):
+            raise ValueError('Unsupported colormap family')
+        if mode not in ('RGB'):
+            raise ValueError('Unsupported color space')
+        if not isinstance(resolution, int) or resolution < 0:
+            raise ValueError('Resolution must be a positive integer')
 
-    @staticmethod
-    def linearMapRGB(color1, color2, resolution=100):
+        if family == 'linear':
+            self.map = self.linearMap()
+
+    def linearMap(self):
         """
         Returns the linear interpolation from `color1`
-        to `color2` in RGB space.
+        to `color2` in RGB space with `resolution` + 1 
+        number of colors.
         """
+
+        xStep = (self.color2[0] - self.color1[0]) / self.resolution
+        yStep = (self.color2[1] - self.color1[1]) / self.resolution
+        zStep = (self.color2[2] - self.color1[2]) / self.resolution
+
+        currentColor = list(self.color1)
+        colorMap = []
+        for i in range(self.resolution):
+            colorMap.append(tuple(map(int, currentColor)))
+            currentColor[0] += xStep
+            currentColor[1] += yStep
+            currentColor[2] += zStep
+        colorMap.append(self.color2)
+
+        return colorMap
+
+    def show(self):
+        """
+        Displays the colorMap in a 
+        len(colorMap) by 50 rectangle.
+         """
+
+        canvas = Image.new(self.mode, (len(self.map), 50))
+        for i in range(len(self.map)):
+            for j in range(50):
+                canvas.putpixel((i,j), self.map[i])
+        canvas.show()
+    
+    def domainToColor(self, n):
+        """
+        Returns the associated color from the color map
+        given `n`, a number within the domain.
+        """
+
+        if n > self.domain[1] or n < self.domain[0]:
+            raise ValueError('number is outside the domain')
         
-        pass
+        normalizedPosition = (n - self.domain[0]) / (self.domain[1] - self.domain[0])
+        index = int((len(self.map) - 1) * normalizedPosition)
+        return self.map[index]
