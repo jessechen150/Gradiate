@@ -68,6 +68,16 @@ class Colormap:
             for j in range(50):
                 canvas.putpixel((i,j), self.map[i])
         canvas.show()
+
+    def combineWith(self, colormap):
+        """
+        Directly append `colormap` to this
+        instance's colormap.
+        """
+        if self.mode != colormap.mode:
+            raise ValueError("Unsupported combination with two different color spaces")
+        self.map += colormap.map
+        self.resolution += colormap.resolution
     
     def domainToColor(self, n):
         """

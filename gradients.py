@@ -65,12 +65,20 @@ class SurfaceGradient(Gradient):
         Draws the gradient on the canvas using
         the given surface.
         """
+        minSV = int(self.surface(0, 0))
+        maxSV = int(self.surface(0, 0))
+
         for x in range(self.width):
             for y in range(self.height):
                 surfaceValue = int(self.surface(x, y))
+                minSV = min(minSV, surfaceValue)
+                maxSV = max(maxSV, surfaceValue)
+                
                 try:
                     color = self.map.domainToColor(surfaceValue)
                 except ValueError:
                     # If value is out of the domain, use black
                     color = (0, 0, 0)
                 self.canvas.putpixel((x,y), color)
+        
+        print(f"Surface value range: [{minSV},{maxSV}]")
