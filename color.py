@@ -89,5 +89,5 @@ class Colormap:
             raise ValueError('number is outside the domain')
         
         normalizedPosition = (n - self.domain[0]) / (self.domain[1] - self.domain[0])
-        index = int((len(self.map) - 1) * normalizedPosition)
+        index = int((self.resolution - 1) * normalizedPosition)
         return self.map[index]
