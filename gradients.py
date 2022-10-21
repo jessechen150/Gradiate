@@ -1,21 +1,19 @@
 from PIL import Image
 
-
-
 class Gradient:
     """
     Abstract gradient class to be inherited.
     """
 
-    def __init__(self, width, height, colormap):
+    def __init__(self, dimensions, colormap):
         """
         Creates a blank canvas for subclasses
         to draw gradients on.
         """
 
         if width > 0 and height > 0:
-            self.width = width
-            self.height = height
+            self.width = dimensions[0]
+            self.height = dimensions[1]
         else:
             raise ValueError('Non-positive integer used for width or height')
         
@@ -49,16 +47,15 @@ class SurfaceGradient(Gradient):
     Gradient defined by a 3D surface.
     """
 
-    def __init__(self, width, height, colormap, surface):
+    def __init__(self, dimensions, colormap, surface):
         """
-        Initializes the gradient image where
-        `width` and `height` are the dimensions of
-        the image and `surface` is a function that maps
-        (x,y) to a value.
+        Initializes the gradient image with
+        dimensions `dimensions` and `surface` 
+        is a function that maps (x,y) to a value.
         """
 
         self.surface = surface
-        super().__init__(width, height, colormap)
+        super().__init__(dimensions, colormap)
     
     def drawGradient(self):
         """
@@ -70,15 +67,38 @@ class SurfaceGradient(Gradient):
 
         for x in range(self.width):
             for y in range(self.height):
-                surfaceValue = int(self.surface(x, y))
+                surfaceValue = self.surface(x, y)
                 minSV = min(minSV, surfaceValue)
                 maxSV = max(maxSV, surfaceValue)
                 
                 try:
                     color = self.map.domainToColor(surfaceValue)
                 except ValueError:
-                    # If value is out of the domain, use black
-                    color = (0, 0, 0)
+                    # If value is out of the domain, use magenta
+                    color = (255, 0, 255)
                 self.canvas.putpixel((x,y), color)
         
         print(f"Surface value range: [{minSV},{maxSV}]")
+
+    
+class CurveGradient(Gradient):
+    """
+    Gradient defined by a 2D curve.
+    """
+
+    def __init__(self, dimensions, colormap, curve):
+        """
+        Initializes the gradient image with
+        dimensions `dimensions` and `surface` 
+        is a function that maps (x,y) to a value.
+        """
+
+        self.curve = curve
+        super().__init__(dimensions, colormap)
+
+    def drawGradient(self):
+        """
+        Draws the gradient on the canvas using
+        the given surface.
+        """
+        pass

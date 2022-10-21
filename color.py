@@ -1,7 +1,5 @@
 from PIL import Image
 
-
-
 class Colormap:
     """
     Colormap between two or more colors.

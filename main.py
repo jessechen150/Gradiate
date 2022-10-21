@@ -3,7 +3,7 @@ from color import Colormap
 import math
 
 res = 99
-domain = [0, 100]
+domain = [0, 200]
 
 m1 = Colormap(
     color1=(0, 0, 0), 
@@ -29,12 +29,20 @@ m4 = Colormap(
     domain=domain, 
     resolution=res)
 
+
 m1.combineWith(m2)
 m1.combineWith(m3)
 m1.combineWith(m4)
 
-def surface(x, y):
-    return 100*math.pow(math.e, -0.1 * (((2*x)/100-(((y-200)/100)**3))**2))
+ 
+# def surface(x, y):
+#     return 100*math.pow(math.e, -0.1 * (((2*x)/100-(((y-200)/100)**3))**2))
 
-g = SurfaceGradient(800, 500, m1, surface)
+def blob(x, y):
+    x = (x-100)/100
+    y = (y-100)/100
+    return 100*math.pow(math.e, -x**2 - y**2)
+
+g = SurfaceGradient(800, 500, m1, blob)
 g.show()
+g.save("gradient.png")
