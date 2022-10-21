@@ -89,8 +89,9 @@ class CurveGradient(Gradient):
     def __init__(self, dimensions, colormap, curve):
         """
         Initializes the gradient image with
-        dimensions `dimensions` and `surface` 
-        is a function that maps (x,y) to a value.
+        dimensions `dimensions` and `curve` 
+        is a function that maps (x,y) to a 1 if
+        it is on the curve or 0 if it is not..
         """
 
         self.curve = curve
